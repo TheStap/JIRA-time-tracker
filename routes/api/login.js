@@ -1,32 +1,27 @@
 const router = require('express').Router();
 const axios = require('axios');
-const cookieParser = require('cookie-parser');
 
 router.post('/login', (req, res, next) => {
-
-    let body = req.body;
-    let {password, login} = body;
-    if (password && login) {
-        axios.post('https://jira.goods.ru/rest/auth/1/session',
-            {
-                username: login,
-                password: password
-            },
+    let {password, username, apiBaseUrl} = req.body;
+    if (password && username && apiBaseUrl) {
+        axios.post(`${apiBaseUrl}/rest/auth/1/session`,
+            {password, username},
             {
                 headers: {
                     'content-type': 'application/json'
                 }
             })
             .then(data => {
-                debugger
                 if (data.status === 200)
                 {
                     let session = data.data.session;
-                    res.status(data.status);
-                    res.set({
-                        'set-cookie': `${session.name}=${session.value}`,
-                    })
-                    res.send('ok');
+
+                    res.cookie('jsid', `${session.name}=${session.value}`, {
+                        expires  : new Date('2018-02-02'),
+                        httpOnly : false
+                    });
+
+                    res.status(204).send();
                 }
                 else {
                     next()
@@ -34,12 +29,12 @@ router.post('/login', (req, res, next) => {
             })
             .catch(e => {
                 res.status(e.response.status);
-                res.send({errors: e.response.data.errorMessages})
+                res.send({errors: ['Wrong login or password']})
             })
     }
     else {
         res.status(401);
-        res.json({errors: 'Password and login required'});
+        res.json({errors: ['Password, login and JIRA url are required']});
     }
 });
 

@@ -3,7 +3,6 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const sassMiddleware = require('node-sass-middleware');
 
 
 const app = express();
@@ -17,21 +16,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(sassMiddleware({
-    src: path.join(__dirname, 'public'),
-    dest: path.join(__dirname, 'public'),
-    indentedSyntax: true,
-    sourceMap: true
-}));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
     res.set('Access-Control-Allow-Credentials', true);
     res.set('Access-Control-Allow-Origin', req.headers.origin);
     next();
 });
-
-app.use('/', require('./routes/api/index'));
 
 app.get('/test', (req, res, next) => {
     res.send('hi!');

@@ -4,25 +4,7 @@ const axios = require('axios');
 router.post('/tasks/get', (req, res, next) => {
     let {searchText, apiBaseUrl} = req.body;
     if (searchText && apiBaseUrl) {
-        // axios.get(`${apiBaseUrl}/rest/api/2/issue/MVM-12582`,
-        //     {
-        //         fields: 'attachment',
-        //         headers: {
-        //             cookie: req.cookies.jsid,
-        //             "Content-Type": "application/json"
-        //         }
-        //     }
-        // ).then(r => {
-        //     debugger
-        //     res.send('ok')
-        // }).catch(e => {
-        //     debugger
-        //     res.send('nok')
-        // })
         axios.get(`${apiBaseUrl}/rest/api/2/search`,
-           /* {
-                jql: `text ~ "${searchText}" OR id = "${searchText}"`
-            },*/
             {
                 params: {
                     jql: `text ~ "${searchText}" OR id = "${searchText}"`,
@@ -34,7 +16,6 @@ router.post('/tasks/get', (req, res, next) => {
                 }
             }
         ).then(r => {
-            console.log(r.data);
             res.status(200);
             let description = r.data.issues.map(item => generateDescription(item.fields.description).filter((issue) => issue.trim()));
             res.send(description);
@@ -51,7 +32,6 @@ router.post('/tasks/get', (req, res, next) => {
 
 
    function generateDescription(description) {
-    // .replace(/(![^\s!]+!)/g, this.generatePictureLink.bind(this))
         return description.replace(/(\r\n)+(\r)+/g, '').split('\n');
     }
 

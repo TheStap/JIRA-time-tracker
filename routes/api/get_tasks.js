@@ -4,10 +4,21 @@ const axios = require('axios');
 router.post('/tasks/get', (req, res, next) => {
 	let {searchText, apiBaseUrl} = req.body;
 	if (searchText && apiBaseUrl) {
+		let jql = '';
+		if (!isNaN(parseFloat(searchText))) {
+			jql = `text ~ "${searchText}" OR id = "MVM-${searchText}"`;
+		}
+		else if (/MVM-[1-9]/.test(searchText)) {
+			jql = `text ~ "${searchText}" OR id = "${searchText}"`
+		}
+		else {
+			jql = `text ~ "${searchText}"`;
+		}
+		console.log(jql);
 		axios.get(`${apiBaseUrl}/rest/api/2/search`,
 			{
 				params: {
-					jql: `text ~ "${searchText}" OR id = "${searchText}"`,
+					jql: jql,
 					fields: 'attachment, description, summary'
 				},
 				headers: {
@@ -18,18 +29,18 @@ router.post('/tasks/get', (req, res, next) => {
 		).then(r => {
 			res.status(200);
 			let issues = r.data.issues.map(item => {
-				let description = generateDescription(item.fields.description).filter((issue) => issue.trim());
+				let apiDescription = item.fields.description;
+				let description = apiDescription ? generateDescription(apiDescription).filter((issue) => issue.trim()) : '';
 				return {
-					description: prepareDescription(description, item.fields.attachment),
+					description: description ? prepareDescription(description, item.fields.attachment) : '',
 					summary: item.fields.summary,
 					id: item.key
 				}
 			});
 			res.send(issues);
 		}).catch(e => {
-			res.status(401);
-			res.send({errors: e});
-			//TODO: add error handler
+			res.status(e.response.status);
+			res.send({errors: e.response.data.errorMessages});
 		})
 	} else {
 		res.status(401);

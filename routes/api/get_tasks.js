@@ -17,8 +17,17 @@ router.post('/tasks/get', (req, res, next) => {
             }
         ).then(r => {
             res.status(200);
-            let description = r.data.issues.map(item => generateDescription(item.fields.description).filter((issue) => issue.trim()));
-            res.send(description);
+            let issues = r.data.issues.map(item => {
+                return {
+                    description: generateDescription(item.fields.description).filter((issue) => issue.trim()),
+                    summary: item.fields.summary
+                }
+            });
+            debugger
+            issues.forEach((desc) => {
+
+            })
+            res.send(issues);
         }).catch(e => {
             res.status(401);
             res.send({errors: ['Not Authorized']})
@@ -32,19 +41,26 @@ router.post('/tasks/get', (req, res, next) => {
 
 
    function generateDescription(description) {
+    // .replace(/(![^\s!]+!)/g, this.generatePictureLink.bind(this))
         return description.replace(/(\r\n)+(\r)+/g, '').split('\n');
     }
 
     function generatePictureLink(pic, links) {
+
         return pic.replace(/!/g, '');
     }
 
-    function prapareDescription(description, attachments) {
+    function prapareDescription(descriptions, attachments) {
         return description.map((text) => {
             if (text.match(/(![^\s!]+!)/g)) {
                 return {
                     type: 'link',
                     value: generatePictureLink(text, attachments)
+                }
+            } else {
+                return {
+                    type: 'text',
+                    value: text
                 }
             }
         })

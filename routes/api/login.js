@@ -17,7 +17,7 @@ router.post('/login', (req, res, next) => {
                     let session = data.data.session;
 
                     res.cookie('jsid', `${session.name}=${session.value}`, {
-                        expires  : new Date('2018-02-02'),
+                        expires  : new Date('2019-02-02'),
                         httpOnly : false
                     });
 

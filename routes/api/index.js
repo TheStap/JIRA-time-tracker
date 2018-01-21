@@ -1,9 +1,12 @@
 const router = require('express').Router();
 
-router.use('/api', require('./login'));
-router.use('/api', require('./get_tasks'));
+router.use('/api', require('./auth/login'));
+router.use('/api', require('./tasks/get_tasks'));
+router.use('/api', require('./tasks/get_mytasks'));
+router.use('/api', require('./track/track'));
 
 router.use((req, res, next) => {
+	console.log('there')
     let err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -11,10 +14,8 @@ router.use((req, res, next) => {
 
 // error handler
 router.use((err, req, res, next) => {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
     res.status(err.status || 500);
-    res.send({errors: ['Not Found']});
+    res.send({errors: [err.message]});
 });
 
 module.exports = router;

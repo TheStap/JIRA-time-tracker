@@ -23,11 +23,11 @@ app.get('/test', (req, res, next) => {
     res.send('hi!');
 });
 
-app.use((req, res, next) => {
-    let err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
+// app.use((req, res, next) => {
+//     let err = new Error('Not Found');
+//     err.status = 404;
+//     next(err);
+// });
 
 // error handler
 app.use((err, req, res, next) => {

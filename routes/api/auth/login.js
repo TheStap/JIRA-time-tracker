@@ -1,8 +1,15 @@
 const router = require('express').Router();
 const axios = require('axios');
+const Exception = require("../../../common/errors").Exception;
 
 router.post('/login', (req, res, next) => {
-    let {password, username, apiBaseUrl} = req.body;
+    let apiBaseUrl = req.headers['x-api-base-url'];
+    if (!apiBaseUrl)
+    {
+        throw new Exception(400, 'test');
+    }
+
+    let {password, username} = req.body;
     if (password && username && apiBaseUrl) {
         axios.post(`${apiBaseUrl}/rest/auth/1/session`,
             {password, username},

@@ -1,47 +1,40 @@
 const router = require('express').Router();
 const axios = require('axios');
+const ValidationException = require("../../../common/errors").ValidationException;
 const Exception = require("../../../common/errors").Exception;
 
-router.post('/login', (req, res, next) => {
-    let apiBaseUrl = req.headers['x-api-base-url'];
-    if (!apiBaseUrl)
-    {
-        throw new Exception(400, 'test');
+router.post('/login', async (req, res, next) => {
+    const {password, username} = req.body;
+    const apiBaseUrl = req.headers['x-api-base-url'];
+
+    const validationExceptions = [];
+    if (!password || (password && !password.trim())) {
+        validationExceptions.push('password is required');
+    }
+    if (!username || (username && !username.trim())) {
+        validationExceptions.push('username is required');
+    }
+    if (validationExceptions.length) {
+        next(new ValidationException(validationExceptions));
     }
 
-    let {password, username} = req.body;
-    if (password && username && apiBaseUrl) {
-        axios.post(`${apiBaseUrl}/rest/auth/1/session`,
+    try {
+        const data = await axios.post(`${apiBaseUrl}/rest/auth/1/session`,
             {password, username},
             {
                 headers: {
                     'content-type': 'application/json'
                 }
-            })
-            .then(data => {
-                if (data.status === 200)
-                {
-                    let session = data.data.session;
-
-                    res.cookie('JSID', `${session.name}=${session.value}`, {
-                        expires  : new Date('2019-02-02'),
-                        httpOnly : false
-                    });
-
-                    res.status(204).send();
-                }
-                else {
-                    next()
-                }
-            })
-            .catch(e => {
-                res.status(e.response.status);
-                res.send({errors: ['Wrong login or password']})
-            })
+            });
+        const session = data.data.session;
+        res.cookie('JSID', `${session.name}=${session.value}`, {
+            expires: new Date('2019-02-02'),
+            httpOnly: false
+        });
+        res.status(204).send();
     }
-    else {
-        res.status(401);
-        res.json({errors: ['Password, login and JIRA url are required']});
+    catch (e) {
+        next(new Exception(401, 'Wrong login or password'));
     }
 });
 

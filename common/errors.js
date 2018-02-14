@@ -12,28 +12,34 @@ class Exception extends Error {
 class ValidationException extends Exception {
 
     constructor(validationErrors) {
-        super(422, 'Некорректные данные');
+        super(422, 'Wrong data');
         this.validationErrors = validationErrors;
     }
 }
 
 
 const exceptionHandler = (err, req, res, next) => {
+    let body;
+    let status;
+
     if (err instanceof ValidationException) {
-        res.body = err.validationErrors;
-        res.status = err.statusCode;
+        body = {message: err.message, validationErrors: err.validationErrors};
+        status = err.statusCode;
     }
     else if (err instanceof Exception) {
-        res.body = err.message;
-        res.status = err.statusCode;
+        body = {message: 'Error', error: err.message};
+        status = err.statusCode;
     }
     else {
-        res.body = {message: 'Ошибка сервера', error: err};
-        res.status = 500;
+        body = {message: 'Server Error', error: err.message};
+        status = 500;
     }
-    res.send();
-}
+    res.status(status).send(body);
+};
 
-exports.ValidationException = ValidationException;
-exports.Exception = Exception;
+module.exports = {
+    ValidationException,
+    Exception,
+    exceptionHandler
+}
 

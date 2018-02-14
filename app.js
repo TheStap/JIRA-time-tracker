@@ -1,14 +1,21 @@
 const express = require('express');
-const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const router = require('./routes/api/index');
-const exceptionHandler = require("./common/errors").exceptionHandler;
+const userRoutes = require('./routes/api/userRoutes');
+const routes = require('./routes/api/routes');
 const Exception = require("./common/errors").Exception;
-const ValidationException = require("./common/errors").ValidationException;
+const exceptionHandler = require("./common/errors").exceptionHandler;
+
+
 
 const app = express();
+
+app.use((req, res, next) => {
+    res.set('Access-Control-Allow-Credentials', true);
+    res.set('Access-Control-Allow-Origin', req.headers.origin);
+    next();
+});
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -18,21 +25,29 @@ app.use(cookieParser());
 app.use((req, res, next) => {
     let apiBaseUrl = req.headers['x-api-base-url'];
     if (!apiBaseUrl) {
-        next(new ValidationException('Api base url is required'));
+        next(new Exception(401, 'Api base url is required'));
     }
     else {
         next();
     }
 });
 
-app.use(exceptionHandler);
-
-app.use(router);
+app.use(routes);
 
 app.use((req, res, next) => {
-    res.set('Access-Control-Allow-Credentials', true);
-    res.set('Access-Control-Allow-Origin', req.headers.origin);
-    next();
+    if (!req.cookies.hasOwnProperty('JSID')) {
+        next(new Exception(401, 'JIRA session id is required'));
+    } else {
+        next();
+    }
 });
+
+app.use(userRoutes);
+
+app.use((req, res, next) => {
+    next(new Exception(404, 'Not Found'))
+});
+
+app.use(exceptionHandler);
 
 module.exports = app;

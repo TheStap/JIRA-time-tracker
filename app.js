@@ -4,10 +4,10 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/api/userRoutes');
 const routes = require('./routes/api/routes');
+const ValidationException = require("./common/errors").ValidationException;
 const Exception = require("./common/errors").Exception;
 const exceptionHandler = require("./common/errors").exceptionHandler;
-
-
+const URLRegex = require('./common/httpService').URLRegex;
 
 const app = express();
 
@@ -27,6 +27,9 @@ app.use((req, res, next) => {
     if (!apiBaseUrl) {
         next(new Exception(401, 'Api base url is required'));
     }
+    else if (!URLRegex.test(apiBaseUrl)) {
+        next(new ValidationException('Api base url should be url'));
+    }
     else {
         next();
     }
@@ -35,7 +38,7 @@ app.use((req, res, next) => {
 app.use(routes);
 
 app.use((req, res, next) => {
-    if (!req.cookies.hasOwnProperty('JSID')) {
+    if (req.cookies && !req.cookies['JSID']) {
         next(new Exception(401, 'JIRA session id is required'));
     } else {
         next();

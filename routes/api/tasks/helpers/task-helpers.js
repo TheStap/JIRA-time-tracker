@@ -8,4 +8,9 @@ function generateIssues(issues) {
 	});
 }
 
-module.exports = generateIssues;
+const taskFilter = {
+    expand: 'renderedFields',
+    fields: 'attachment, description, summary'
+};
+
+module.exports = {generateIssues, taskFilter};

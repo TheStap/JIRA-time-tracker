@@ -1,7 +1,10 @@
 const router = require('express').Router();
 const axios = require('axios');
+const HttpService = require("../../../common/httpService").HttpService;
 const ValidationException = require("../../../common/errors").ValidationException;
 const Exception = require("../../../common/errors").Exception;
+
+const NEXT_YEAR = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 
 router.post('/login', async (req, res, next) => {
     const {password, username} = req.body;
@@ -19,22 +22,15 @@ router.post('/login', async (req, res, next) => {
     }
 
     try {
-        const data = await axios.post(`${apiBaseUrl}/rest/auth/1/session`,
-            {password, username},
-            {
-                headers: {
-                    'content-type': 'application/json'
-                }
-            });
+        const data = await HttpService.sendPostRequest(apiBaseUrl, {password, username}, ['auth', '1', 'session']);
         const session = data.data.session;
         res.cookie('JSID', `${session.name}=${session.value}`, {
-            expires: new Date('2019-02-02'),
+            expires: NEXT_YEAR,
             httpOnly: false
-        });
-        res.status(204).send();
+        }).status(204).send();
     }
     catch (e) {
-        next(new Exception(401, 'Wrong login or password'));
+        next(e);
     }
 });
 

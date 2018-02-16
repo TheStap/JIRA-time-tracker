@@ -18,7 +18,7 @@ router.post('/login', async (req, res, next) => {
         validationExceptions.push('username is required');
     }
     if (validationExceptions.length) {
-        next(new ValidationException(validationExceptions));
+        return next(new ValidationException(validationExceptions));
     }
 
     try {
@@ -30,7 +30,7 @@ router.post('/login', async (req, res, next) => {
         }).status(204).send();
     }
     catch (e) {
-        next(e);
+        return next(e);
     }
 });
 

@@ -17,7 +17,7 @@ router.get('/mytasks/get', async (req, res, next) => {
         res.status(200).send(generateIssues(data.data.issues));
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 });
 

@@ -1,40 +1,57 @@
 const router = require('express').Router();
 const axios = require('axios');
+const ValidationException = require("../../../common/errors").ValidationException;
+const HttpService = require("../../../common/httpService").HttpService;
 
-router.post('/track', (req, res, next) => {
-	let {time, taskId, apiBaseUrl} = req.body;
-	let totalTime = generateTimeInSeconds(time);
-	if (apiBaseUrl && totalTime && taskId) {
-		if (req.cookies.hasOwnProperty('JSID')) {
-			axios.post(`${apiBaseUrl}/rest/api/2/issue/${taskId}/worklog`,
-				{
-					"comment": "I did some work here.",
-					"started": getDefaultDate(),
-					"timeSpentSeconds": totalTime
-				},
-				{
-					headers: {
-						cookie: req.cookies.JSID,
-						"Content-Type": "application/json"
-					}
-				}
-			).then(r => {
-				res.status(200);
-				res.send(r.data);
-			}).catch(e => {
-				res.status(e.response.status);
-				res.send({errors: e.response.data.errorMessages});
-			})
-		}
-		else {
-			res.status(401);
-			res.json({errors: ['JSID required']});
-		}
-	} else {
-		res.status(401);
-		res.json({errors: ['apiBaseUrl and time required']});
-	}
+router.post('/track', async (req, res, next) => {
+    const apiBaseUrl = req.headers['x-api-base-url'];
+    const JSID = req.cookies.JSID;
+	const {time, taskId, comment} = req.body;
+
+    const validationExceptions = [];
+    if (!time) {
+        validationExceptions.push('time is required');
+    }
+    else {
+        const {hours, minutes} = time;
+        const isBothFieldsNotValid = (hours && !isNumeric(hours)) && (minutes && !isNumeric(minutes));
+        if (isBothFieldsNotValid) {
+            validationExceptions.push('hours must be a number');
+            validationExceptions.push('minutes must be a number');
+        }
+    }
+    if (!taskId || (taskId && !taskId.trim())) {
+        validationExceptions.push('taskId is required');
+    }
+    const totalTime = generateTimeInSeconds(time);
+    if (!totalTime) {
+        validationExceptions.push('total time must be more than 0 seconds');
+    }
+    if (validationExceptions.length) {
+        return next(new ValidationException(validationExceptions));
+    }
+
+    const filter = {
+        timeSpentSeconds: totalTime,
+        started: getDefaultDate()
+    };
+    if (comment)
+    {
+        filter.comment = comment;
+    }
+
+    try {
+        await HttpService.sendPostRequest(apiBaseUrl, filter, ['api', '2', 'issue', taskId, 'worklog'], JSID);
+        res.status(204).send();
+    }
+    catch (e) {
+        return next(e);
+    }
 });
+
+function isNumeric(value) {
+    return !isNaN(value - parseFloat(value));
+}
 
 function generateTimeInSeconds(time)
 {

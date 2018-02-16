@@ -13,7 +13,7 @@ router.get('/tasks/get', async (req, res, next) => {
     const JSID = req.cookies.JSID;
 
     if (!searchText || (searchText && !searchText.trim())) {
-        next(new ValidationException('searchText is required'))
+        return next(new ValidationException('searchText is required'))
     }
     const filter = {...taskFilter, jql: generateJQL(searchText)};
     try {
@@ -21,7 +21,7 @@ router.get('/tasks/get', async (req, res, next) => {
         res.status(200).send(generateIssues(data.data.issues));
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 });
 

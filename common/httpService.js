@@ -17,9 +17,9 @@ class HttpService {
         console.log(url);
         try {
             return await http.get(url, {
-                    params,
-                    headers
-                })
+                params,
+                headers
+            })
         }
         catch (e) {
             throw HttpService.getError(e);

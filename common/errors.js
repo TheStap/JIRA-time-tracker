@@ -37,9 +37,14 @@ const exceptionHandler = (err, req, res, next) => {
     res.status(status).send(body);
 };
 
+const notFoundHandler = (req, res, next) => {
+    next(new Exception(404, 'Not Found'))
+};
+
 module.exports = {
     ValidationException,
     Exception,
-    exceptionHandler
-}
+    exceptionHandler,
+    notFoundHandler
+};
 

@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const axios = require('axios');
 const ValidationException = require("../../../common/errors").ValidationException;
 const HttpService = require("../../../common/httpService").HttpService;
 

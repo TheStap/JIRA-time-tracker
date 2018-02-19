@@ -3,16 +3,15 @@
 /**
  * Module dependencies.
  */
-const config = require('../config');
 const app = require('../app');
-const debug = require('debug')('shooter:server');
+const debug = require('debug')('jira_time_tracker:server');
 const http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || config.get('port'));
+const port = normalizePort(process.env.PORT || 9999);
 app.set('port', port);
 
 /**

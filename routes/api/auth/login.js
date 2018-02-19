@@ -1,8 +1,6 @@
 const router = require('express').Router();
-const axios = require('axios');
 const HttpService = require("../../../common/httpService").HttpService;
 const ValidationException = require("../../../common/errors").ValidationException;
-const Exception = require("../../../common/errors").Exception;
 
 const NEXT_YEAR = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 

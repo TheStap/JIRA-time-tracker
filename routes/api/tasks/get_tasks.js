@@ -1,10 +1,8 @@
 const generateIssues = require("./helpers/task-helpers").generateIssues;
 
 const router = require('express').Router();
-const axios = require('axios');
 const taskFilter = require("./helpers/task-helpers").taskFilter;
 const ValidationException = require("../../../common/errors").ValidationException;
-const Exception = require("../../../common/errors").Exception;
 const HttpService = require("../../../common/httpService").HttpService;
 
 router.get('/tasks/get', async (req, res, next) => {
@@ -13,7 +11,7 @@ router.get('/tasks/get', async (req, res, next) => {
     const JSID = req.cookies.JSID;
 
     if (!searchText || (searchText && !searchText.trim())) {
-        return next(new ValidationException('searchText is required'))
+        return next(new ValidationException(['searchText is required']))
     }
     const filter = {...taskFilter, jql: generateJQL(searchText)};
     try {

@@ -2,9 +2,7 @@ const generateIssues = require("./helpers/task-helpers").generateIssues;
 const taskFilter = require("./helpers/task-helpers").taskFilter;
 
 const router = require('express').Router();
-const axios = require('axios');
 const HttpService = require("../../../common/httpService").HttpService;
-const Exception = require("../../../common/errors").Exception;
 
 const tasksFromDashboard = 'assignee = currentUser() AND resolution = unresolved ORDER BY priority DESC, created ASC';
 

@@ -6,7 +6,7 @@ const HttpService = require("../../../common/httpService").HttpService;
 router.post('/track', async (req, res, next) => {
     const apiBaseUrl = req.headers['x-api-base-url'];
     const JSID = req.cookies.JSID;
-	const {time, taskId, comment} = req.body;
+	const {time, taskId, comment, started} = req.body;
 
     const validationExceptions = [];
     if (!time) {
@@ -39,7 +39,7 @@ router.post('/track', async (req, res, next) => {
     {
         filter.comment = comment;
     }
-
+    filter.started = started ? started : getDefaultDate();
     try {
         await HttpService.sendPostRequest(apiBaseUrl, filter, ['api', '2', 'issue', taskId, 'worklog'], JSID);
         res.status(204).send();

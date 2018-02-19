@@ -1,53 +1,36 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var sassMiddleware = require('node-sass-middleware');
+const express = require('express');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const userRoutes = require('./routes/api/userRoutes');
+const routes = require('./routes/api/routes');
+const setDefaultHeaders = require("./common/middlewares").setDefaultHeaders;
+const sessionIdChecker = require("./common/middlewares").sessionIdChecker;
+const baseUrlChecker = require("./common/middlewares").baseUrlChecker;
+const notFoundHandler = require("./common/errors").notFoundHandler;
+const exceptionHandler = require("./common/errors").exceptionHandler;
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+const app = express();
 
-var app = express();
+app.use(setDefaultHeaders);
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'twig');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+if (process.env.NODE_ENV === 'dev') {
+    app.use(logger('dev'));
+}
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(sassMiddleware({
-  src: path.join(__dirname, 'public'),
-  dest: path.join(__dirname, 'public'),
-  indentedSyntax: true, // true = .sass and false = .scss
-  sourceMap: true
-}));
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.use(baseUrlChecker);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+app.use(routes);
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(sessionIdChecker);
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+app.use(userRoutes);
+
+app.use(notFoundHandler);
+
+app.use(exceptionHandler);
 
 module.exports = app;

@@ -5,7 +5,7 @@ const HttpService = require("../../../common/httpService").HttpService;
 router.post('/track', async (req, res, next) => {
     const apiBaseUrl = req.headers['x-api-base-url'];
     const JSID = req.cookies.JSID;
-	const {time, taskId, comment, started} = req.body;
+    const {time, taskId, comment, started} = req.body;
 
     const validationExceptions = [];
     if (!time) {
@@ -33,8 +33,7 @@ router.post('/track', async (req, res, next) => {
     const filter = {
         timeSpentSeconds: totalTime
     };
-    if (comment)
-    {
+    if (comment) {
         filter.comment = comment;
     }
     filter.started = started ? started : getDefaultDate();
@@ -51,21 +50,20 @@ function isNumeric(value) {
     return !isNaN(value - parseFloat(value));
 }
 
-function generateTimeInSeconds(time)
-{
-	const {hours, minutes} = time;
-	let result = 0;
-	if (hours) {
-		result += hours * 3600;
-	}
-	if (minutes) {
-		result += minutes * 60;
-	}
-	return result;
+function generateTimeInSeconds(time) {
+    const {hours, minutes} = time;
+    let result = 0;
+    if (hours) {
+        result += hours * 3600;
+    }
+    if (minutes) {
+        result += minutes * 60;
+    }
+    return result;
 }
 
 function getDefaultDate() {
-	return new Date().toISOString().replace('Z', '+0000');
+    return new Date().toISOString().replace('Z', '+0000');
 }
 
 module.exports = router;

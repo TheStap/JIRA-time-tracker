@@ -31,8 +31,7 @@ router.post('/track', async (req, res, next) => {
     }
 
     const filter = {
-        timeSpentSeconds: totalTime,
-        started: getDefaultDate()
+        timeSpentSeconds: totalTime
     };
     if (comment)
     {

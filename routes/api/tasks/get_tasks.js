@@ -1,3 +1,5 @@
+const sessionIdChecker = require("../../../common/middlewares").sessionIdChecker;
+const baseUrlChecker = require("../../../common/middlewares").baseUrlChecker;
 const generateIssues = require("./helpers/task-helpers").generateIssues;
 
 const router = require('express').Router();
@@ -5,7 +7,7 @@ const taskFilter = require("./helpers/task-helpers").taskFilter;
 const ValidationException = require("../../../common/errors").ValidationException;
 const HttpService = require("../../../common/httpService").HttpService;
 
-router.get('/tasks/get', async (req, res, next) => {
+router.get('/tasks/get', baseUrlChecker, sessionIdChecker, async (req, res, next) => {
     const {searchText} = req.query;
     const apiBaseUrl = req.headers['x-api-base-url'];
     const JSID = req.cookies.JSID;

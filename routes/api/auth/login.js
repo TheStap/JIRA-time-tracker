@@ -1,10 +1,11 @@
+const baseUrlChecker = require("../../../common/middlewares").baseUrlChecker;
 const router = require('express').Router();
 const HttpService = require("../../../common/httpService").HttpService;
 const ValidationException = require("../../../common/errors").ValidationException;
 
 const NEXT_YEAR = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', baseUrlChecker, async (req, res, next) => {
     const {password, username} = req.body;
     const apiBaseUrl = req.headers['x-api-base-url'];
 

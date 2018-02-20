@@ -1,3 +1,5 @@
+const baseUrlChecker = require("../../../common/middlewares").baseUrlChecker;
+const sessionIdChecker = require("../../../common/middlewares").sessionIdChecker;
 const generateIssues = require("./helpers/task-helpers").generateIssues;
 const taskFilter = require("./helpers/task-helpers").taskFilter;
 
@@ -6,7 +8,7 @@ const HttpService = require("../../../common/httpService").HttpService;
 
 const tasksFromDashboard = 'assignee = currentUser() AND resolution = unresolved ORDER BY priority DESC, created ASC';
 
-router.get('/mytasks/get', async (req, res, next) => {
+router.get('/mytasks/get', baseUrlChecker, sessionIdChecker, async (req, res, next) => {
     const apiBaseUrl = req.headers['x-api-base-url'];
     const JSID = req.cookies.JSID;
     const filter = {...taskFilter, jql: tasksFromDashboard};

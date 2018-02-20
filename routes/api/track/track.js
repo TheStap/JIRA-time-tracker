@@ -1,8 +1,10 @@
+const sessionIdChecker = require("../../../common/middlewares").sessionIdChecker;
+const baseUrlChecker = require("../../../common/middlewares").baseUrlChecker;
 const router = require('express').Router();
 const ValidationException = require("../../../common/errors").ValidationException;
 const HttpService = require("../../../common/httpService").HttpService;
 
-router.post('/track', async (req, res, next) => {
+router.post('/track', baseUrlChecker, sessionIdChecker, async (req, res, next) => {
     const apiBaseUrl = req.headers['x-api-base-url'];
     const JSID = req.cookies.JSID;
     const {time, taskId, comment, started} = req.body;

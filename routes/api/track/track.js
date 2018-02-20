@@ -38,7 +38,7 @@ router.post('/track', async (req, res, next) => {
     }
     filter.started = started ? started : getDefaultDate();
     try {
-        await HttpService.sendPostRequest(apiBaseUrl, filter, ['api', '2', 'issue', taskId, 'worklog'], JSID);
+        // await HttpService.sendPostRequest(apiBaseUrl, filter, ['api', '2', 'issue', taskId, 'worklog'], JSID);
         res.status(204).send();
     }
     catch (e) {

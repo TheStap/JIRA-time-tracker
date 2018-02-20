@@ -4,6 +4,7 @@ const URLRegex = require('./httpService').URLRegex;
 
 const baseUrlChecker = (req, res, next) => {
     let apiBaseUrl = req.headers['x-api-base-url'];
+    console.log(req.body);
     if (!apiBaseUrl) {
         next(new Exception(401, 'Api base url is required'));
     }
@@ -25,7 +26,8 @@ const sessionIdChecker = (req, res, next) => {
 
 const setDefaultHeaders = (req, res, next) => {
     res.set('Access-Control-Allow-Credentials', true);
-    res.set('Access-Control-Allow-Origin', req.headers.origin);
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', '*');
     next();
 };
 

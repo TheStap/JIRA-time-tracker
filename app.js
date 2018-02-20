@@ -26,13 +26,14 @@ app.use(cookieParser());
 
 app.use(baseUrlChecker);
 
-app.use(notFoundHandler);
-
 app.use(routes);
 
 app.use(sessionIdChecker);
 
 app.use(userRoutes);
+
+// TODO: rework not found handler, make it apply before checkers middlewares
+app.use(notFoundHandler);
 
 app.use(exceptionHandler);
 

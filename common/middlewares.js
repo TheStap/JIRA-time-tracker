@@ -4,7 +4,6 @@ const URLRegex = require('./httpService').URLRegex;
 
 const baseUrlChecker = (req, res, next) => {
     let apiBaseUrl = req.headers['x-api-base-url'];
-    console.log(req.body);
     if (!apiBaseUrl) {
         next(new Exception(401, 'Api base url is required'));
     }

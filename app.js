@@ -4,16 +4,16 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/api/userRoutes');
 const routes = require('./routes/api/routes');
-const setDefaultHeaders = require("./common/middlewares").setDefaultHeaders;
 const notFoundHandler = require("./common/errors").notFoundHandler;
 const exceptionHandler = require("./common/errors").exceptionHandler;
 const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
-
-app.use(setDefaultHeaders);
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
 if (process.env.NODE_ENV === 'dev') {
     app.use(logger('dev'));
